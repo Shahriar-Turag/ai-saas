@@ -3,7 +3,7 @@ import * as z from 'zod';
 
 import axios from 'axios';
 import Heading from '@/components/heading/Heading';
-import { Download, ImageIcon, MessageSquare } from 'lucide-react';
+import { Download, ImageIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -15,9 +15,6 @@ import { useRouter } from 'next/navigation';
 
 import { Empty } from '@/components/emptyState/Empty';
 import { Loader } from '@/components/loader/Loader';
-import { cn } from '@/lib/utils';
-import { UserAvatar } from '@/components/user-avatar/UserAvatar';
-import { BotAvatar } from '@/components/bot-avatar/BotAvatar';
 import { useState } from 'react';
 import {
 	Select,
@@ -28,8 +25,11 @@ import {
 } from '@/components/ui/select';
 import { Card, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
+import { useProModal } from '@/hooks/use-pro-modal';
+import { toast } from 'react-hot-toast';
 
 const ImagePage = () => {
+	const proModal = useProModal();
 	const router = useRouter();
 	const [images, setImages] = useState<string[]>([]);
 
@@ -60,8 +60,11 @@ const ImagePage = () => {
 
 			form.reset();
 		} catch (error: any) {
-			//TODO: open pro modal
-			console.log(error);
+			if (error?.response?.status === 403) {
+				proModal.onOpen();
+			} else {
+				toast.error('Something went wrong');
+			}
 		} finally {
 			router.refresh();
 		}

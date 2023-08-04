@@ -20,9 +20,12 @@ import { cn } from '@/lib/utils';
 import { UserAvatar } from '@/components/user-avatar/UserAvatar';
 import { BotAvatar } from '@/components/bot-avatar/BotAvatar';
 import ReactMarkdown from 'react-markdown';
+import { useProModal } from '@/hooks/use-pro-modal';
+import { toast } from 'react-hot-toast';
 
 const CodePage = () => {
 	const router = useRouter();
+	const proModal = useProModal();
 	const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>(
 		[]
 	);
@@ -52,8 +55,11 @@ const CodePage = () => {
 
 			form.reset();
 		} catch (error: any) {
-			//TODO: open pro modal
-			console.log(error);
+			if (error?.response?.status === 403) {
+				proModal.onOpen();
+			} else {
+				toast.error('Something went wrong');
+			}
 		} finally {
 			router.refresh();
 		}
